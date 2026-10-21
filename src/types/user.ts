@@ -1,12 +1,13 @@
 interface UserLogin {
   userName:string,
   password:string,
+  remember: boolean,
 }
 interface UserRegister {
   userName:string,
   password:string,
   rePassword:string,
-  rememberMe:boolean,
+  remember:boolean,
 }
 interface UserFindPassword {
   userName:string,

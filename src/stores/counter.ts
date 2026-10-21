@@ -1,14 +1,23 @@
 import { defineStore } from 'pinia'
 import { useStorage } from '@vueuse/core'
-import {computed, ref} from "vue"
-import type {UserInfo} from '@/types/user.ts'
+import type { UserInfo, UserLogin } from '@/types/user.ts'
+
 export const useUserStore = defineStore('userStore', () => {
-  const token = useStorage('userToken','')
-  const userInfo = ref<UserInfo | null>(null)
-  const isLogin = computed(() => !!token.value)
+  const token = useStorage('userToken', '')
+  const userInfo = useStorage<UserInfo | null>('userInfo',null)
+
+  const userList = useStorage<UserLogin[]>('userForm', [{
+    userName: 'admin',
+    password: '123456',
+    remember: false,
+  }])
+  /**
+   * 登出
+   */
   function logout() {
     token.value = ''
     userInfo.value = null
   }
-  return {token,userInfo,logout,isLogin}
+
+  return { token, userInfo, userList, logout }
 })
