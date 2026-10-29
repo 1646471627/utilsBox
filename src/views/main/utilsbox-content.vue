@@ -6,25 +6,30 @@
         <el-breadcrumb-item :to="{ path: '/home' }">首页</el-breadcrumb-item>
         <el-breadcrumb-item>工具箱</el-breadcrumb-item>
       </el-breadcrumb>
-      <span><span style="font-style:italic">当前用户:{{user}}</span></span>
+      <span><span style="font-style:italic">当前用户:{{ user }}</span></span>
       <span @click="exit" class="exit">退出登录</span>
     </div>
 
-
-    <!-- 工具切换按钮 -->
+    <!-- 工具切换卡片 -->
     <div class="utils-nav">
-      <el-button
-        type="primary"
-        @click="$router.push('/home/utils/calculate')"
+      <el-radio-group
+        v-model="activeTool"
+        @change="handleToolChange"
+        class="tool-group"
       >
-        计算器
-      </el-button>
-      <el-button
-        type="primary"
-        @click="$router.push('/home/utils/todolist')"
-      >
-        待办事项表
-      </el-button>
+        <el-radio-button value="calculate">
+          <div class="tool-card">
+            <el-icon :size="28"><Odometer /></el-icon>
+            <span>计算器</span>
+          </div>
+        </el-radio-button>
+        <el-radio-button value="todolist">
+          <div class="tool-card">
+            <el-icon :size="28"><List /></el-icon>
+            <span>待办事项表</span>
+          </div>
+        </el-radio-button>
+      </el-radio-group>
     </div>
 
     <!-- 子路由出口 -->
@@ -35,23 +40,35 @@
 </template>
 
 <script setup lang="ts">
-  import {computed} from 'vue'
-  import {ElMessage} from "element-plus"
-  import {useUserStore} from "@/stores/counter.ts"
-  import {useRouter} from "vue-router"
+import { computed } from 'vue'
+import { ElMessage } from 'element-plus'
+import { useUserStore } from '@/stores/counter.ts'
+import { useRoute, useRouter } from 'vue-router'
+import { Odometer, List } from '@element-plus/icons-vue'
 
-  const userStore = useUserStore()
-  const router = useRouter()
+const userStore = useUserStore()
+const router = useRouter()
+const route = useRoute()
 
+const user = computed(() => {
+  return userStore.userInfo?.userName || '未知用户'
+})
 
-  const user = computed(() => {
-    return userStore.userInfo?.userName || '未知用户'
-  })
-  const exit = () => {
-    ElMessage.success('退出登录成功')
-    router.push('/login')
-    userStore.logout()
-  }
+// 从路由推导当前选中项（刷新/直接访问子路由也能正确高亮）
+const activeTool = computed(() => {
+  if (route.path.includes('/todolist')) return 'todolist'
+  return 'calculate'
+})
+
+const handleToolChange = (val: string | number | boolean | undefined) => {
+  router.push(`/home/utils/${val}`)
+}
+
+const exit = () => {
+  ElMessage.success('退出登录成功')
+  router.push('/login')
+  userStore.logout()
+}
 </script>
 
 <style lang="scss" scoped>
@@ -62,19 +79,68 @@
 }
 .utils-nav {
   display: flex;
-  gap: 8px;
+
+  :deep(.tool-group) {
+    display: flex;
+    gap: 20px;
+  }
+
+  :deep(.el-radio-button) {
+    width: 120px;
+    height: 110px;
+
+    .el-radio-button__inner {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 8px;
+      border: 1px solid #dcdfe6;
+      box-shadow: none;
+      transition: all 0.2s;
+    }
+
+    &:first-child .el-radio-button__inner,
+    &:last-child .el-radio-button__inner {
+      border-radius: 8px;
+    }
+
+    // 选中态
+    &.is-active .el-radio-button__inner {
+      border-color: #409eff;
+      background: #ecf5ff;
+      color: #409eff;
+      box-shadow: 0 4px 12px rgba(64, 158, 255, 0.15);
+    }
+
+    // hover 态
+    &:hover .el-radio-button__inner {
+      border-color: #409eff;
+      color: #409eff;
+    }
+  }
+
+  .tool-card {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+  }
 }
 .utils-content {
   padding: 16px;
 }
-.top-box{
+.top-box {
   display: flex;
   justify-content: space-between;
-  .exit{
+  .exit {
     color: #409eff;
     cursor: pointer;
     font-size: 14px;
-    &:hover{
+    &:hover {
       text-decoration: underline;
     }
   }
