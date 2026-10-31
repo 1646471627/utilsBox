@@ -56,8 +56,7 @@ const user = computed(() => {
 
 // 从路由推导当前选中项（刷新/直接访问子路由也能正确高亮）
 const activeTool = computed(() => {
-  if (route.path.includes('/todolist')) return 'todolist'
-  return 'calculate'
+  return route.name === 'todolist' ? 'todolist' : 'calculate'
 })
 
 const handleToolChange = (val: string | number | boolean | undefined) => {
@@ -66,8 +65,8 @@ const handleToolChange = (val: string | number | boolean | undefined) => {
 
 const exit = () => {
   ElMessage.success('退出登录成功')
-  router.push('/login')
   userStore.logout()
+  router.push('/login')
 }
 </script>
 

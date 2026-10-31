@@ -34,6 +34,9 @@ const rePassword = ref('')
 const router = useRouter()
 const u = useUserStore()
 const goLogin = () => {
+  username.value = ''
+  password.value = ''
+  rePassword.value = ''
   router.push('/login')
 }
 const register = () => {

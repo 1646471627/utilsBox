@@ -120,16 +120,15 @@ const isShow = ref(false)
 const searchData = ref('')
 const editingId = ref<string | null>(null)
 
-
-
 const filteredList = computed(() => {
   const kw = searchData.value.trim()
   if (!kw) return planList.value
   return planList.value.filter(item =>
-    item.subject.includes(kw) ||
-    item.content.includes(kw) ||
-    item.learnTime.includes(kw) ||
-    item.address.includes(kw))
+    item.subject.toLowerCase().includes(kw.toLowerCase()) ||
+    item.content.toLowerCase().includes(kw.toLowerCase()) ||
+    item.learnTime.toLowerCase().includes(kw.toLowerCase()) ||
+    item.address.toLowerCase().includes(kw.toLowerCase())
+  )
 })
 const stats = computed(() => ({
   done:planList.value.filter(item => item.status).length,
@@ -176,15 +175,17 @@ const delList = async (id:string,status:boolean,name:string) => {
     return
   }
   try {
-    await el.elconfirm(`确定要删除学科名称为${name}的待办事项吗?`,'提示',
+    const ok = await el.elconfirm(`确定要删除学科名称为${name}的待办事项吗?`,'提示',
       {
       confirmButtonText:'确定删除',
       cancelButtonText:'取消删除',
       type:'info'
       }
     )
-    planList.value = planList.value.filter(item => item.id !== id)
-    el.sAlert('删除成功')
+    if(ok){
+      planList.value = planList.value.filter(item => item.id !== id)
+      el.sAlert('删除成功')
+    }
   }catch{}
 }
 const editForm = ref({ subject: '', content: '', address: '', learnTime: '' })

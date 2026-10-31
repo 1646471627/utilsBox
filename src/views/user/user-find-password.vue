@@ -40,6 +40,7 @@ const goLogin = () => {
 
 
 const changePassword = () => {
+  flag.value = false
   if(username.value.trim() === '') {
     el.wAlert('请输入用户名')
     return
